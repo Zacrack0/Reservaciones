@@ -1,0 +1,219 @@
+﻿@page "/Reservas/nueva"
+@rendermode InteractiveServer
+@inject IRepositorio _repositorio
+@inject NavigationManager _navigation
+<h3>Repositorio</h3>
+<EditForm Model="_reserva" FormName="FormReserva" OnValidSubmit="Guardar">
+  <DataAnnotationsValidator />
+    
+         <div class="row mb-3">
+    <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
+    <div class="col-10">
+    <InputText id="txtUsuario" class="form-control" @bind-Value="_reserva.Usuario"/>
+    <ValidationMessage For="@(()=>_reserva.Usuario)" />
+    </div>
+    </div>
+    
+
+    <div>
+    <div class="row mb-3">
+    <label for="txtSala" class="col-2 col-form label">Sala</label>
+    <div class="col-10">
+    <InputText id="txtSala" class="form-control" @bind-Value="_reserva.Salas"/>
+    <ValidationMessage For="@(()=>_reserva.Salas)" />
+    </div>
+    </div>
+    </div>
+    
+    <div class="row mb-3">
+    <label for="txtSala" class="col-2 col-form label">Fecha</label>
+    <div class="col-10">
+    <InputDate id="Fecha" class="form-control" @bind-Value="_reserva.Fecha"/>
+    <ValidationMessage For="@(()=>_reserva.Fecha)" />
+    </div>
+    </div>
+    
+    <div class="row mb-3">
+        <label for="txtSala" class="col-2 col-form label">Duracion</label>
+        <div class="col-10">
+            <InputDate id="Duracion" class="form-control" @bind-Value="_reserva.Duracion" />
+            <ValidationMessage For="@(()=>_reserva.Duracion)" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtSala" class="col-2 col-form label">Pago</label>
+        <div class="col-10">
+            <InputText id="Fecha" class="form-control" @bind-Value="_reserva.Pago" />
+            <ValidationMessage For="@(()=>_reserva.Pago)" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit" @onclick="Guardar">Guardar</button>
+    @if (_isEditMode)
+    {
+        <button type="button" class="btn btn-success" @onclick="ActualizarReserva">Actualizar</button>
+        <button type="button" class="btn btn-warning" @onclick="CancelarReserva">Cancelar</button>
+    }
+    <br />
+    <br />
+    <br />
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="alert alert-danger">@_errorMessage</div>
+        }
+    <br />
+</EditForm>
+<button @onclick="MostrarTabla" class="btn btn-secondary">Salas Reservadas</button>
+
+@if (mostrar)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Pagado en Efectivo</th>
+                <th>PAgado con Tarjeta</th>
+                <th>Aun por Pagar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@ContarSalasReservadas("Efectivo")</td>
+                 <td>@ContarSalasReservadas("Tarjeta")</td>
+                  <td>@ContarSalasReservadas("Por Pagar")</td>
+            </tr>
+        </tbody>
+    </table>
+}
+    
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Salas</th>
+            <th>Fecha</th>
+            <th>Duracion</th>
+            <th>Pago</th>
+            <th>Acciones</th>
+        </tr>
+   
+    </thead>
+    <tbody>
+    
+        @foreach (var _salas in _listaSalas)
+        {
+            <tr>
+                <td>@_salas.Usuario</td>
+                <td>@_salas.Salas</td>
+                <td>@_salas.Fecha</td>
+                <td>@_salas.Duracion</td>
+                <td>@_salas.Pago</td>
+                <td>
+                    <button type="button" class="btn btn-danger" @onclick="() => EliminarReserva(_reserva)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn-info" @onclick="() => EditarReserva(_reserva)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+    
+@code {
+    private List<Reserva> _listaSalas = new List<Reserva>();
+    private Reserva _reserva = new();
+    private string _errorMessage = "";
+    private bool _isEditMode = false;
+    private Reserva? _reservaEditando;
+
+    private bool mostrar = false;
+
+    private void MostrarTabla()
+    {
+        mostrar = true;
+    }
+
+    public int ContarSalasReservadas(string reserva)
+    {
+        return _listaSalas.Count(r => r.Salas == reserva);
+    }
+
+    private void AddReserva()
+    {
+        _errorMessage = "";
+        if (_listaSalas.Any(r => r.Salas == _reserva.Salas))
+        {
+            _errorMessage = "Esa sala ya fue reservada.";
+            return;
+        }
+        _listaSalas.Add(_reserva);
+        _reserva = new Reserva();
+    }
+
+    private void EliminarReserva(Reserva Salas)
+    {
+        _listaSalas.Remove(Salas);
+    }
+
+    private void EditarReserva(Reserva _salas)
+    {
+        _reservaEditando = _salas;
+        _reserva = new Reserva
+            {
+                Usuario = _salas.Usuario,
+                Salas = _salas.Salas,
+                Fecha = _salas.Fecha,
+                Duracion = _salas.Duracion,
+                Pago = _salas.Pago
+            };
+        _isEditMode = true;
+    }
+
+    private void ActualizarReserva()
+    {
+        _reservaEditando.Usuario = _reserva.Usuario;
+        _reservaEditando.Salas = _reserva.Salas;
+        _reservaEditando.Fecha = _reserva.Fecha;
+        _reservaEditando.Duracion = _reserva.Duracion;
+        _reservaEditando.Pago = _reserva.Pago;
+        _reserva = new Reserva();
+        _isEditMode = false;
+    }
+
+    private bool _isSaving = false;
+
+
+    private async Task Guardar()
+    {
+        if (_isSaving) return; // Evita múltiples ejecuciones concurrentes
+        _isSaving = true;
+       
+        try
+        {
+        await _repositorio.Add(_reserva);
+        _navigation.NavigateTo("reservaciones");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Hubo un error al guardar la reserva: " + ex.Message;
+        }
+        finally
+        {
+            _isSaving = false; // Restablece el estado
+        }
+    }
+
+    private void CancelarReserva()
+    {
+        _reserva = new Reserva();
+        _isEditMode = false;
+    }
+
+}
